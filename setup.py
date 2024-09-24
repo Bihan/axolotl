@@ -35,15 +35,14 @@ def parse_requirements():
             _install_requires.pop(_install_requires.index(xformers_version))
         else:
             import torch
+            # detect the version of torch already installed
+            # and set it so dependencies don't clobber the torch version
+            torch_version = version("torch")
+            _install_requires.append(f"torch=={torch_version}")
             if torch.version.hip is not None:
                 # Don't install xformers on ROCM
                 _install_requires.pop(_install_requires.index(xformers_version))
             else:
-                # detect the version of torch already installed
-                # and set it so dependencies don't clobber the torch version
-                torch_version = version("torch")
-                _install_requires.append(f"torch=={torch_version}")
-
                 version_match = re.match(r"^(\d+)\.(\d+)(?:\.(\d+))?", torch_version)
                 if version_match:
                     major, minor, patch = version_match.groups()
